@@ -22,28 +22,19 @@ class Leilao:
     def __init__(self, descricao):
         self.descricao = descricao
         self.__lances = []
-
-    def propoe(self, lance: Lance):
-        self.__lances.append(lance)
-
-    @property
-    def lances(self):
-        return self.__lances[:]
-
-class Avaliador:
-
-    def __init__(self):
-        # Use a biblioteca "sys" para determinar os valores
-        self.maior_lance = sys.float_info.min
+        self.maior_lance = sys.float_info.min   # Use a biblioteca "sys" para determinar os valores
         self.menor_lance = sys.float_info.max
 
-    # Use o "anotation:" para facilitar o consumo da classe (para ler, use o ctrl + p durante o uso)
-    def avalia(self, leilao: Leilao):
-
-        for lance in leilao.lances:
+    def propoe(self, lance: Lance):    # Use o "anotation:" para facilitar o consumo da classe (para ler, use o ctrl + p durante o uso)
+        if not self.__lances or self.__lances[-1].usuario != lance.usuario:
             if lance.valor > self.maior_lance:
                 self.maior_lance = lance.valor
             if lance.valor < self.menor_lance:
                 self.menor_lance = lance.valor
 
+            self.__lances.append(lance)
+
+    @property
+    def lances(self):
+        return self.__lances[:] # [:] para cópia raza
 
