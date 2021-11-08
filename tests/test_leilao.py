@@ -5,9 +5,9 @@ from src.leilao.dominio import Usuario, Lance, Leilao
 
 class TestAvaliador(TestCase):
 
-    def setUp(self):
-        self.rafa = Usuario('Rafa')
-        self.karol = Usuario('Karol')
+    def setUp(self,):
+        self.rafa = Usuario('Rafa', 500.0)
+        self.karol = Usuario('Karol', 500.0)
         self.lance_do_rafa = Lance(self.rafa, 100.0)
         self.lance_da_karol = Lance(self.karol, 150.0)
         self.leilao = Leilao('Celular')
@@ -38,7 +38,7 @@ class TestAvaliador(TestCase):
         self.assertEqual(100.0, self.leilao.menor_lance)
 
     def test_deve_retornar_maior_e_menor_valor_quando_leilao_tiver_tres_lances(self):
-        vini = Usuario('Vini')
+        vini = Usuario('Vini', 500.0)
 
         lance_do_vini = Lance(vini, 200.0)
 
@@ -61,7 +61,7 @@ class TestAvaliador(TestCase):
 
     # se o último usuário for diferente, deve permitir propor lance
     def test_deve_permitir_propor_lance_caso_o_ultimo_usuario_seja_diferente(self):
-        vini = Usuario('Vini')
+        vini = Usuario('Vini', 500.0)
         lance_do_vini = Lance(vini, 200.0)
 
         self.leilao.propoe(self.lance_do_rafa)
