@@ -1,4 +1,5 @@
-import sys
+from src.leilao.excecoes import LanceInvalido
+
 
 class Usuario:
 
@@ -7,14 +8,13 @@ class Usuario:
         self.__carteira = carteira
 
     def propoe_lance(self, leilao, valor):
-        if valor > self.__carteira:
-            raise ValueError('O valor do lance NÃO DEVE ser maior que o valor da carteira')
+        if not self._valor_eh_valido(valor):
+            raise LanceInvalido('O valor do lance NÃO DEVE ser maior que o valor da carteira')
 
         lance = Lance(self, valor)
         leilao.propoe(lance)
 
         self.__carteira -= valor
-
 
     @property
     def nome(self):
@@ -23,6 +23,9 @@ class Usuario:
     @property
     def carteira(self):
         return self.__carteira
+
+    def _valor_eh_valido(self, valor):
+        return valor <= self.__carteira
 
 
 class Lance:
@@ -37,22 +40,36 @@ class Leilao:
     def __init__(self, descricao):
         self.descricao = descricao
         self.__lances = []
-        self.maior_lance = sys.float_info.min   # Use a biblioteca "sys" para determinar os valores
-        self.menor_lance = sys.float_info.max
+        self.maior_lance = 0.0
+        self.menor_lance = 0.0
 
-    def propoe(self, lance: Lance):    # Use o "anotation:" para facilitar o consumo da classe (para ler, use o ctrl + p durante o uso)
-        if not self.__lances or self.__lances[-1].usuario != lance.usuario and lance.valor > self.__lances[-1].valor:
-            if lance.valor > self.maior_lance:
-                self.maior_lance = lance.valor
-            if lance.valor < self.menor_lance:
+    def propoe(self, lance: Lance):
+        if self._lance_eh_valido(lance):
+            if not self._tem_lances():
                 self.menor_lance = lance.valor
 
-            self.__lances.append(lance)
-        else:
-            raise ValueError('Erro ao propor lance.')
+            self.maior_lance = lance.valor
 
+            self.__lances.append(lance)
 
     @property
     def lances(self):
         return self.__lances[:] # [:] para cópia raza
+
+    def _tem_lances(self):
+        return self.__lances
+
+    def _usuarios_diferentes(self, lance):
+        if self.__lances[-1].usuario != lance.usuario:
+            return True
+        raise LanceInvalido('O usuário não pode ofertar DOIS lances seguidos')
+
+    def _valor_maior_que_lance_anterior(self, lance):
+        if lance.valor > self.__lances[-1].valor:
+            return True
+        raise LanceInvalido('O valor do lance deve ser MAIOR que o lance anterior')
+
+    def _lance_eh_valido(self, lance):
+       return not self._tem_lances() or (self._usuarios_diferentes(lance) and
+                                         self._valor_maior_que_lance_anterior(lance))
 
